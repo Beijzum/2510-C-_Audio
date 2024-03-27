@@ -8,8 +8,7 @@
 // ./insertAudio.exe ./soundClips/gokuDrip.wav ./out.wav
 
 int checkFormat(WAVHEADER header) {
-    char wave[4];
-    if (!strcmp(strncpy(wave, header.format, 4), "WAVE")) {
+    if (header.format[0] == 'W' && header.format[1] == 'A' && header.format[2] == 'V' && header.format[3] == 'E') {
         return 1;
     } else return 0;
 }
