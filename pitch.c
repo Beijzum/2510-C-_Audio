@@ -26,19 +26,6 @@ int checkFormat(WAVHEADER header) {
 
 
 /**
- * Check if the file is a .wav file by checking the format field in the header
- *
- * @param header the header of the .wav file
- * @return stream block of bytes
- */
-int getBlockSize(WAVHEADER header) {
-    int channels = header.numChannels;
-    int BytesPerSample = header.bitsPerSample / 8;
-    return channels * BytesPerSample;
-}
-
-
-/**
  * Format file name output.
  *
  * @param newFileName is the pointer to the new file name
@@ -59,6 +46,13 @@ void formatFileName(char* newFileName, const char *fileName) {
 
 /**
  * Drives the program.
+ *
+ * How to use:
+ * To run program edit the configurations to have arguments "./nativeSoundClips/test.wav 1.5"
+ * The first argument is the file to be pitched
+ * Second argument if the pitch factor which will decrease or increase the pitch sampling of the file
+ * The outputted file will be in the output folder for listening
+ * WARNING: be aware the outputted .WAV can be quite loud so turn down the volume before listening
 */
 int main(int argc, char* argv[]) {
     if (argc < 3) {
