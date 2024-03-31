@@ -59,6 +59,17 @@ char* formatFileName(const char *fileName) {
 }
 
 /**
+ * Updates the header after increasing the sampling rate by 1.5x.
+ *
+ * @param header the header of the .wav file
+ * @param scalingFactor the scaling factor applied to the audio samples
+ */
+void updateHeader(WAVHEADER *header, double scalingFactor) {
+    header->subchunk2Size *= scalingFactor;
+    header->chunkSize = 36 + header->subchunk2Size;
+}
+
+/**
  * Drives the program.
 */
 int main(int argc, char* argv[]) {
@@ -89,11 +100,12 @@ int main(int argc, char* argv[]) {
 
     char* outputPath = formatFileName(fileWAV);
     FILE* outputAudio = fopen(outputPath, "wb");
-    fwrite(&header, sizeof(WAVHEADER), 1, outputAudio);
 
     WORD blockSize = getBlockSize(header);
     WORD buffer[blockSize];
     WORD maxSampleValue = 0;
+    double scalingFactor = 1.0;
+
     while (fread(&buffer, blockSize, 1, inputAudio)) {
         for (int i = 0; i < blockSize; i++) {
             buffer[i] = (buffer[i] * 3) / 2;
@@ -102,7 +114,6 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        double scalingFactor = 1.0;
         if (header.bitsPerSample == 8) {
             scalingFactor = 128.0 / maxSampleValue;
         } else if (header.bitsPerSample == 16) {
@@ -112,11 +123,13 @@ int main(int argc, char* argv[]) {
             buffer[i] = (WORD)(buffer[i] * scalingFactor);
         }
 
-        header.subchunk2Size = header.subchunk2Size * scalingFactor;
-        fseek(outputAudio, 0, SEEK_SET);
-        fwrite(&header, sizeof(WAVHEADER), 1, outputAudio);
         fwrite(&buffer, blockSize, 1, outputAudio);
     }
+
+    updateHeader(&header, scalingFactor);
+
+    fseek(outputAudio, 0, SEEK_SET);
+    fwrite(&header, sizeof(WAVHEADER), 1, outputAudio);
 
     fclose(inputAudio);
     fclose(outputAudio);
