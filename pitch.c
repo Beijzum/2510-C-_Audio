@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    char* fileWAVPath = argv[2];
+    char* fileWAVPath = argv[1];
     FILE* inputAudio = fopen(fileWAVPath, "rb");
     if (inputAudio == NULL) {
         printf("Error, %s not found\n", fileWAVPath);
@@ -72,8 +72,6 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    fseek(inputAudio, sizeof(WAVHEADER), SEEK_SET);
-
     double pitchFactor = 1.2;
     int newAudioSize = (int) (header.subchunk2Size / pitchFactor);
     int16_t* audioData = malloc(header.subchunk2Size);
@@ -81,8 +79,7 @@ int main(int argc, char* argv[]) {
     fread(audioData, sizeof(int16_t), header.subchunk2Size / sizeof(int16_t), inputAudio);
 
     for (int i = 0; i < newAudioSize; i++) {
-        int sourceIndex = (int)(i * pitchFactor);
-        newAudioData[i] = audioData[sourceIndex];
+        newAudioData[i] = audioData[i];
     }
 
     char newFileName[MAX_FILE_NAME];
@@ -97,7 +94,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    header.subchunk2Size = newAudioSize * sizeof(int16_t);
+    header.subchunk2Size = newAudioSize;
     fwrite(&header, sizeof(WAVHEADER), 1, outputAudio);
     fwrite(newAudioData, sizeof(int16_t), newAudioSize, outputAudio);
 
