@@ -52,6 +52,9 @@ void formatFileName(char* newFileName, const char *fileName) {
  * The first argument is the file to be pitched
  * Second argument if the pitch factor which will decrease or increase the pitch sampling of the file
  * The outputted file will be in the output folder for listening
+ *
+ * ADDITIONAL INFORMATION: make sure the .wav comes from the ./nativeSoundClips
+ *
  * WARNING: be aware the outputted .WAV can be quite loud so turn down the volume before listening
 */
 int main(int argc, char* argv[]) {
