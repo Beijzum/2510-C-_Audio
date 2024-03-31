@@ -63,10 +63,31 @@ char* formatFileName(const char *fileName) {
  *
  * @param header the header of the .wav file
  * @param scalingFactor the scaling factor applied to the audio samples
+ * @param originalDataSize the original size of the audio data
  */
-void updateHeader(WAVHEADER *header, double scalingFactor) {
+void updateHeader(WAVHEADER *header, double scalingFactor, long originalDataSize) {
+    // Update subchunk2Size based on the scaling factor and original data size
     header->subchunk2Size *= scalingFactor;
-    header->chunkSize = 36 + header->subchunk2Size;
+
+    // Update chunkSize by adding the size of subchunk1Size, subchunk2Size, and 36 bytes (fixed header size)
+    header->chunkSize = 36 + originalDataSize + (header->subchunk2Size * scalingFactor);
+}
+
+/**
+ * Finds the max sample value of the audio samples.
+ *
+ * @param buffer block of audio samples
+ * @param blockSize size of the audio samples
+ * @return maximum value of the audio samples
+ */
+WORD findMaxSampleValue(WORD *buffer, int blockSize) {
+    WORD maxSampleValue = 0;
+    for (int i = 0; i < blockSize; i++) {
+        if (buffer[i] > maxSampleValue) {
+            maxSampleValue = buffer[i];
+        }
+    }
+    return maxSampleValue;
 }
 
 /**
@@ -100,34 +121,54 @@ int main(int argc, char* argv[]) {
 
     char* outputPath = formatFileName(fileWAV);
     FILE* outputAudio = fopen(outputPath, "wb");
+    if (outputAudio == NULL) {
+        printf("Error creating output file\n");
+        fclose(inputAudio);
+        return 1;
+    }
+
+    // Write original header to output file
+    fwrite(&header, sizeof(WAVHEADER), 1, outputAudio);
 
     WORD blockSize = getBlockSize(header);
     WORD buffer[blockSize];
-    WORD maxSampleValue = 0;
     double scalingFactor = 1.0;
 
+    // Find max sample value in the entire audio file
+    WORD maxSampleValue = 0;
     while (fread(&buffer, blockSize, 1, inputAudio)) {
-        for (int i = 0; i < blockSize; i++) {
-            buffer[i] = (buffer[i] * 3) / 2;
-            if (buffer[i] > maxSampleValue) {
-                maxSampleValue = buffer[i];
-            }
+        WORD currentMaxSampleValue = findMaxSampleValue(buffer, blockSize);
+        if (currentMaxSampleValue > maxSampleValue) {
+            maxSampleValue = currentMaxSampleValue;
         }
+    }
 
-        if (header.bitsPerSample == 8) {
-            scalingFactor = 128.0 / maxSampleValue;
-        } else if (header.bitsPerSample == 16) {
-            scalingFactor = 32768.0 / maxSampleValue;
-        }
+    // Calculate scaling factor
+    if (header.bitsPerSample == 8) {
+        scalingFactor = 128.0 / maxSampleValue;
+    } else if (header.bitsPerSample == 16) {
+        scalingFactor = 32768.0 / maxSampleValue;
+    }
+
+    // Reset file pointer to the beginning
+    fseek(inputAudio, sizeof(WAVHEADER), SEEK_SET);
+
+    // Process audio data and write to output file
+    while (fread(&buffer, blockSize, 1, inputAudio)) {
         for (int i = 0; i < blockSize; i++) {
             buffer[i] = (WORD)(buffer[i] * scalingFactor);
         }
-
         fwrite(&buffer, blockSize, 1, outputAudio);
     }
 
-    updateHeader(&header, scalingFactor);
+    fseek(inputAudio, 0, SEEK_END);
+    long originalDataSize = ftell(inputAudio) - sizeof(WAVHEADER);
+    fseek(inputAudio, sizeof(WAVHEADER), SEEK_SET);
 
+    // Update header
+    updateHeader(&header, scalingFactor, originalDataSize);
+
+    // Move file pointer to the beginning and write updated header to output file
     fseek(outputAudio, 0, SEEK_SET);
     fwrite(&header, sizeof(WAVHEADER), 1, outputAudio);
 
