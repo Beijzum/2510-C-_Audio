@@ -3,10 +3,7 @@
 #include <stdlib.h>
 #include "wav.h"
 
-typedef uint8_t   BYTE;
-typedef uint16_t  WORD;
-typedef uint32_t  DWORD;
-
+// Define WAV header structure
 typedef struct
 {
     BYTE   chunkID[4];
@@ -24,31 +21,73 @@ typedef struct
     DWORD  subchunk2Size;
 } WavHeader;
 
-int main() {
+// Function to read WAV header from file
+int readWavHeader(FILE *file, WavHeader *header) {
+    if (file == NULL || header == NULL) {
+        return 0; // Error: Invalid input think of 0 as false
+    }
+    fread(header, sizeof(WavHeader), 1, file);
+    return 1; // Success think 1 as true
+}
 
+// Function to read audio samples from file
+int readAudioSamples(FILE *file, int16_t *samples, size_t num_samples) {
+    if (file == NULL || samples == NULL) {
+        return 0; // Error: Invalid input
+    }
+    fread(samples, sizeof(int16_t), num_samples, file);
+    return 1; // Success
+}
+
+// Function to reverse audio samples
+void reverseSamples(int16_t *samples, int16_t *reversedSamples, size_t num_samples) {
+    for (size_t i = 0; i < num_samples; i++) {
+        reversedSamples[i] = samples[num_samples - i - 1];
+    }
+}
+
+// Function to write WAV header to file
+void writeWavHeader(FILE *file, WavHeader *header) {
+    fwrite(header, sizeof(WavHeader), 1, file);
+}
+
+// Function to write audio samples to file
+void writeAudioSamples(FILE *file, int16_t *samples, size_t num_samples) {
+    fwrite(samples, sizeof(int16_t), num_samples, file);
+}
+
+int main() {
+    FILE *inputFile;
     FILE *outputFile;
     WavHeader header;
     int16_t *samples;
     int16_t *reversedSamples;
-    size_t i;
 
-    FILE *inputFile; //buffer for File to be opened
-    inputFile = fopen("test.wav", "rb");   // Open input WAV file
+    // Open input WAV file
+    inputFile = fopen("test.wav", "rb");
     if (inputFile == NULL) {
-        printf("Error: Unable to open input WAV file\n"); return 1;
+        printf("Error: Unable to open input WAV file\n");       return 1;
     }
 
-    fread(&header, sizeof(WAVHEADER), 1, inputFile);
+    // Read WAV header
+    if (!readWavHeader(inputFile, &header)) {
+        printf("Error: Unable to read WAV header\n");
+        fclose(inputFile);      return 1;
+    }
 
-    // Allocate memory
+    // Allocate memory for audio samples
     samples = (int16_t *)malloc(header.subchunk2Size);
     if (samples == NULL) {
         printf("Error: Memory allocation failed\n");
-        fclose(inputFile); return 1;
+        fclose(inputFile);      return 1;
     }
 
     // Read audio samples
-    fread(samples, sizeof(int16_t), header.subchunk2Size / sizeof(int16_t), inputFile);
+    if (!readAudioSamples(inputFile, samples, header.subchunk2Size / sizeof(int16_t))) {
+        printf("Error: Unable to read audio samples\n");
+        fclose(inputFile);      free(samples);
+        return 1;
+    }
 
     // Close input WAV file
     fclose(inputFile);
@@ -57,30 +96,28 @@ int main() {
     reversedSamples = (int16_t *)malloc(header.subchunk2Size);
     if (reversedSamples == NULL) {
         printf("Error: Memory allocation failed\n");
-        free(samples); return 1;
+        free(samples);
+        return 1;
     }
 
     // Reverse audio samples
-    for (i = 0; i < header.subchunk2Size / sizeof(int16_t); i++) {
-        reversedSamples[i] = samples[header.subchunk2Size / sizeof(int16_t) - i - 1];
-    }
+    reverseSamples(samples, reversedSamples, header.subchunk2Size / sizeof(int16_t));
 
     // Open output WAV file
     outputFile = fopen("reversedAudio.wav", "wb");
     if (outputFile == NULL) {
         printf("Error: Unable to create output WAV file\n");
-        free(samples); free(reversedSamples); //FREE if error
-        return 1;
+        free(samples); free(reversedSamples);       return 1;
     }
 
     // Update file size in header
     header.chunkSize = sizeof(WavHeader) + header.subchunk2Size - 8;
 
     // Write WAV header
-    fwrite(&header, sizeof(WavHeader), 1, outputFile);
+    writeWavHeader(outputFile, &header);
 
     // Write reversed audio samples
-    fwrite(reversedSamples, sizeof(int16_t), header.subchunk2Size / sizeof(int16_t), outputFile);
+    writeAudioSamples(outputFile, reversedSamples, header.subchunk2Size / sizeof(int16_t));
 
     // Close output WAV file
     fclose(outputFile);
