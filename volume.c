@@ -17,14 +17,15 @@ int checkFormat(WAVHEADER header) {
 
 /**
  * How to use:
- * To run program, use terminal and enter: "./soundClips/audio.wav ./output/out.wav volumeFactor(float)"
- * Example: ./nativeSoundClips/test.wav ./output/testVolume1.wav 2.0
+ * 1. Compile the program into an .exe file (for example, clicking the "Run" button in Visual Studio Code)
+ * 2. Use terminal and enter: "./volume ./soundClips/audio.wav ./output/out.wav volumeFactor(float)"
+ * Example: ./volume ./nativeSoundClips/test.wav ./output/testVolume1.wav 2.0
  * This example will increase the volume (by double the original volume) of the test.wav file and output it to testVolume1.wav
  */
 
 int main(int argc, char* argv[]) {
     if (argc != 4) {
-        printf("Invalid usage: ./volume ./soundClips/audio.wav ./output/out.wav 2.0 (factor)\n");
+        printf("Invalid usage: ./volume ./nativeSoundClips/test.wav ./output/testVolume.wav 2.0\n");
         return 1;
     }
 
