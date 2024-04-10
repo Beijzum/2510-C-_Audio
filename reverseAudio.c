@@ -3,30 +3,34 @@
 #include <stdlib.h>
 #include "wav.h"
 
+//typedef uint8_t   BYTE;
+//typedef uint16_t  WORD;
+//typedef uint32_t  DWORD;
+
 // Define WAV header structure
-typedef struct
-{
-    BYTE   chunkID[4];
-    DWORD  chunkSize;
-    BYTE   format[4];
-    BYTE   subchunk1ID[4];
-    DWORD  subchunk1Size;
-    WORD   audioFormat;
-    WORD   numChannels;
-    DWORD  sampleRate;
-    DWORD  byteRate;
-    WORD   blockAlign;
-    WORD   bitsPerSample;
-    BYTE   subchunk2ID[4];
-    DWORD  subchunk2Size;
-} WavHeader;
+//typedef struct
+//{
+//    BYTE   chunkID[4];
+//    DWORD  chunkSize;
+//    BYTE   format[4];
+//    BYTE   subchunk1ID[4];
+//    DWORD  subchunk1Size;
+//    WORD   audioFormat;
+//    WORD   numChannels;
+//    DWORD  sampleRate;
+//    DWORD  byteRate;
+//    WORD   blockAlign;
+//    WORD   bitsPerSample;
+//    BYTE   subchunk2ID[4];
+//    DWORD  subchunk2Size;
+//} WavHeader;
 
 // Function to read WAV header from file
-int readWavHeader(FILE *file, WavHeader *header) {
+int readWavHeader(FILE *file, WAVHEADER *header) {
     if (file == NULL || header == NULL) {
         return 0; // Error: Invalid input think of 0 as false
     }
-    fread(header, sizeof(WavHeader), 1, file);
+    fread(header, sizeof(WAVHEADER), 1, file);
     return 1; // Success think 1 as true
 }
 
@@ -47,8 +51,8 @@ void reverseSamples(int16_t *samples, int16_t *reversedSamples, size_t num_sampl
 }
 
 // Function to write WAV header to file
-void writeWavHeader(FILE *file, WavHeader *header) {
-    fwrite(header, sizeof(WavHeader), 1, file);
+void writeWavHeader(FILE *file, WAVHEADER *header) {
+    fwrite(header, sizeof(WAVHEADER), 1, file);
 }
 
 // Function to write audio samples to file
@@ -59,7 +63,7 @@ void writeAudioSamples(FILE *file, int16_t *samples, size_t num_samples) {
 int main() {
     FILE *inputFile;
     FILE *outputFile;
-    WavHeader header;
+    WAVHEADER header;
     int16_t *samples;
     int16_t *reversedSamples;
 
@@ -111,7 +115,7 @@ int main() {
     }
 
     // Update file size in header
-    header.chunkSize = sizeof(WavHeader) + header.subchunk2Size - 8;
+    header.chunkSize = sizeof(WAVHEADER) + header.subchunk2Size - 8;
 
     // Write WAV header
     writeWavHeader(outputFile, &header);
