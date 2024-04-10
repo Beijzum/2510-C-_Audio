@@ -10,7 +10,7 @@
 
 ## Overview
 
-This is a repo dedicated to our project where we showcase different ways to manipulate audio.
+This is a repo dedicated to our project where we showcase different ways to manipulate audio using C.
 
 ## Relevant Links
 
