@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
 
     // ensure valid usage
     if (argc != 4) {
-        printf("Invalid usage: ./insertAudio.exe ./soundClips/audio1.wav ./soundClips/audio2.wav ./out.wav\n");
+        printf("Invalid usage: ./mixAudio.exe ./audio1.wav ./audio2.wav ./out.wav\n");
         return 1;
     }
 
