@@ -5,8 +5,11 @@
 
 #include "wav.h"
 
-// ./insertAudio.exe ./soundClips/gokuDrip.wav ./out.wav
-
+/**
+ * In order to run this program, you must type "gcc slowAudio.c -o slowAudio.exe" into terminal.
+ * Next type in "./slowAudio.exe ./SoundClips/input.wav ./output/output.wav"
+ * For example, "./slowAudio.exe ./SoundClips/huh.wav ./output/huh_slow.wav"
+ */
 int checkFormat(WAVHEADER header) {
     if (header.format[0] == 'W' && header.format[1] == 'A' && header.format[2] == 'V' && header.format[3] == 'E') {
         return 1;
@@ -19,7 +22,7 @@ int getBlockSize(WAVHEADER header) {
     return channels * BytesPerSample;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
 
     // ensure valid usage
     if (argc != 3) {
@@ -28,14 +31,14 @@ int main(int argc, char* argv[]) {
     }
 
     // ensure out file has .wav extension
-    char* fileExtension = &argv[2][strlen(argv[2]) - 4];
+    char *fileExtension = &argv[2][strlen(argv[2]) - 4];
     if (strcmp(fileExtension, ".wav")) {
         printf("Invalid usage, ensure outfile has .wav file extension\n");
         return 1;
     }
 
     // Open audio file
-    FILE* inputAudio = fopen(argv[1], "rb");
+    FILE *inputAudio = fopen(argv[1], "rb");
     if (inputAudio == NULL) {
         printf("Error, %s not found\n", argv[1]);
         return 1;
@@ -55,7 +58,7 @@ int main(int argc, char* argv[]) {
     WORD blockSize = getBlockSize(header);
 
     // open output file
-    FILE* outputAudio = fopen(argv[2], "wb");
+    FILE *outputAudio = fopen(argv[2], "wb");
 
     // change sample rate
     header.sampleRate = header.sampleRate / 2;
@@ -63,7 +66,7 @@ int main(int argc, char* argv[]) {
     // write header to file
     fwrite(&header, sizeof(WAVHEADER), 1, outputAudio);
 
-    WORD buffer[blockSize]; 
+    WORD buffer[blockSize];
 
     // write data
     while (fread(&buffer, blockSize, 1, inputAudio)) {
