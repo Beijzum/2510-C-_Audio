@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 
     // ensure valid usage
     if (argc != 3) {
-        printf("Invalid usage: ./insertAudio.exe ./soundClips/audio.wav ./out.wav\n");
+        printf("Invalid usage: ./slowAudio.exe ./soundClips/audio.wav ./out.wav\n");
         return 1;
     }
 
