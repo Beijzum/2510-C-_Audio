@@ -65,13 +65,13 @@ int main(int argc, char* argv[]) {
 
     fwrite(&header, sizeof(WAVHEADER), 1, outputAudio); // write new header to output file
 
-    int16_t buffer[1024]; // 1024 bytes total. WAV is a 16-bit format, so we use int16_t to store the audio data, which means each sample is 2 bytes
+    uint16_t buffer[1024]; // 1024 bytes total. WAV is a 16-bit format, so we use int16_t to store the audio data, which means each sample is 2 bytes
     size_t bytesRead;
-    while ((bytesRead = fread(buffer, sizeof(int16_t), sizeof(buffer) / sizeof(int16_t), inputAudio)) > 0) { // read inputAudio file and store into buffer variable
+    while ((bytesRead = fread(buffer, sizeof(uint16_t), sizeof(buffer) / sizeof(uint16_t), inputAudio)) > 0) { // read inputAudio file and store into buffer variable
         for (size_t i = 0; i < bytesRead; i++) { // loop through buffer and multiply each byte by volumeFactor
-            buffer[i] = (int16_t)(buffer[i] * volumeFactor); // cast to int16_t to avoid overflow
+            buffer[i] = (uint16_t)(buffer[i] * volumeFactor); // cast to int16_t to avoid overflow
         }
-        fwrite(buffer, sizeof(int16_t), bytesRead, outputAudio); // write updated buffer (changed volume) to output file
+        fwrite(buffer, sizeof(uint16_t), bytesRead, outputAudio); // write updated buffer (changed volume) to output file
     }
 
     fclose(inputAudio);
