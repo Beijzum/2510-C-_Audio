@@ -3,28 +3,6 @@
 #include <stdlib.h>
 #include "wav.h"
 
-//typedef uint8_t   BYTE;
-//typedef uint16_t  WORD;
-//typedef uint32_t  DWORD;
-
-// Define WAV header structure
-//typedef struct
-//{
-//    BYTE   chunkID[4];
-//    DWORD  chunkSize;
-//    BYTE   format[4];
-//    BYTE   subchunk1ID[4];
-//    DWORD  subchunk1Size;
-//    WORD   audioFormat;
-//    WORD   numChannels;
-//    DWORD  sampleRate;
-//    DWORD  byteRate;
-//    WORD   blockAlign;
-//    WORD   bitsPerSample;
-//    BYTE   subchunk2ID[4];
-//    DWORD  subchunk2Size;
-//} WavHeader;
-
 // Function to read WAV header from file
 int readWavHeader(FILE *file, WAVHEADER *header) {
     if (file == NULL || header == NULL) {
@@ -60,6 +38,14 @@ void writeAudioSamples(FILE *file, int16_t *samples, size_t num_samples) {
     fwrite(samples, sizeof(int16_t), num_samples, file);
 }
 
+/**
+ * How to use:
+ * Simply running the code using a compiler like Clion will directly convert a soundclip called "test3.wav"
+ * inside a directory called "nativeSoundClip". Then it will output a file called "reversedAudio" inside a folder called
+ * "output"
+ *
+ * @return none
+ */
 int main() {
     FILE *inputFile;
     FILE *outputFile;
@@ -68,7 +54,7 @@ int main() {
     int16_t *reversedSamples;
 
     // Open input WAV file
-    inputFile = fopen("test.wav", "rb");
+    inputFile = fopen("./nativeSoundClips/test3.wav", "rb");
     if (inputFile == NULL) {
         printf("Error: Unable to open input WAV file\n");       return 1;
     }
@@ -108,7 +94,7 @@ int main() {
     reverseSamples(samples, reversedSamples, header.subchunk2Size / sizeof(int16_t));
 
     // Open output WAV file
-    outputFile = fopen("reversedAudio.wav", "wb");
+    outputFile = fopen("./output/reversedAudio.wav", "wb");
     if (outputFile == NULL) {
         printf("Error: Unable to create output WAV file\n");
         free(samples); free(reversedSamples);       return 1;
