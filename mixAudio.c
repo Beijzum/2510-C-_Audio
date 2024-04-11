@@ -5,7 +5,9 @@
 
 #include "wav.h"
 
-// ./insertAudio.exe ./nativeSoundClips/test.wav ./nativeSoundClips/test2.wav ./out.wav
+// How to use:
+// Compile the hcode into an executable file and run it with the following command: "./mixAudio.exe ./audio1.wav ./audio2.wav ./out.wav"
+// This program will blend two audio files into one, with the output file being the third argument.
 
 int min(int a, int b) {
     if (a < b) {
@@ -15,10 +17,10 @@ int min(int a, int b) {
 }
 
 int checkFormat(WAVHEADER header) {
-    char wave[4];
-    if (!strcmp(strncpy(wave, header.format, 4), "WAVE")) {
+    if (header.format[0] == 'W' && header.format[1] == 'A' && header.format[2] == 'V' && header.format[3] == 'E') {
         return 1;
     } else return 0;
+    char wave[4];
 }
 
 int getBlockSize(WAVHEADER header) {
@@ -133,7 +135,13 @@ int main(int argc, char* argv[]) {
     WAVHEADER newHeader = constructNewHeader(header1, header2, chunkSize, subChunk2Size);
     fseek(outputAudio, 0, SEEK_SET);
 
+    // write header to file
     fwrite(&newHeader, sizeof(WAVHEADER), 1, outputAudio);
+
+    // close files
+    fclose(inputAudio1);
+    fclose(inputAudio2);
+    fclose(outputAudio);
 
     return 0;
 }

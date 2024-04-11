@@ -5,7 +5,7 @@
 
 #include "wav.h"
 
-// ./insertAudio.exe ./soundClips/gokuDrip.wav ./out.wav
+// Template audio file that all subsequent audio manipulation files expand upon
 
 int checkFormat(WAVHEADER header) {
     if (header.format[0] == 'W' && header.format[1] == 'A' && header.format[2] == 'V' && header.format[3] == 'E') {
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 
     // ensure valid usage
     if (argc != 3) {
-        printf("Invalid usage: ./insertAudio.exe ./soundClips/audio.wav ./out.wav\n");
+        printf("Invalid usage: ./copyAudio.exe ./audio.wav ./out.wav\n");
         return 1;
     }
 
@@ -67,6 +67,7 @@ int main(int argc, char* argv[]) {
         fwrite(&buffer, blockSize, 1, outputAudio);
     }
 
+    // close files
     fclose(inputAudio);
     fclose(outputAudio);
 

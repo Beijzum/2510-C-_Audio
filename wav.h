@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+// Credit to CS50 Harvard!
+
 typedef uint8_t   BYTE;
 typedef uint16_t  WORD;
 typedef uint32_t  DWORD;
