@@ -12,7 +12,7 @@ int readWavHeader(FILE *file, WAVHEADER *header) {
     return 1; // Success think 1 as true
 }
 
-// Function to read audio samples from file
+// Function to read audio samples from file  - - - -- -- - - --
 int readAudioSamples(FILE *file, int16_t *samples, size_t num_samples) {
     if (file == NULL || samples == NULL) {
         return 0; // Error: Invalid input
@@ -21,7 +21,7 @@ int readAudioSamples(FILE *file, int16_t *samples, size_t num_samples) {
     return 1; // Success
 }
 
-// Function to reverse audio samples
+// Function to reverse audio samples  - - -- -  - - - - -
 void reverseSamples(int16_t *samples, int16_t *reversedSamples, size_t num_samples) {
     for (size_t i = 0; i < num_samples; i++) {
         reversedSamples[i] = samples[num_samples - i - 1];
@@ -54,7 +54,7 @@ int main() {
     int16_t *reversedSamples;
 
     // Open input WAV file
-    inputFile = fopen("./nativeSoundClips/test3.wav", "rb");
+    inputFile = fopen("./nativeSoundClips/Dixie.wav", "rb"); //find Dixie inside nativeSoundclip directory
     if (inputFile == NULL) {
         printf("Error: Unable to open input WAV file\n");       return 1;
     }
@@ -94,7 +94,7 @@ int main() {
     reverseSamples(samples, reversedSamples, header.subchunk2Size / sizeof(int16_t));
 
     // Open output WAV file
-    outputFile = fopen("./output/reversedAudio.wav", "wb");
+    outputFile = fopen("./output/reversedAudio.wav", "wb"); // --- Output: reversedAudio.wav inside output directory
     if (outputFile == NULL) {
         printf("Error: Unable to create output WAV file\n");
         free(samples); free(reversedSamples);       return 1;
