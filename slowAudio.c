@@ -6,10 +6,12 @@
 #include "wav.h"
 
 /**
+ * Slows the audio, thereby decreasing pitch.
  * In order to run this program, you must type "gcc slowAudio.c -o slowAudio.exe" into terminal.
  * Next type in "./slowAudio.exe ./SoundClips/input.wav ./output/output.wav"
  * For example, "./slowAudio.exe ./SoundClips/huh.wav ./output/huh_slow.wav"
  */
+
 int checkFormat(WAVHEADER header) {
     if (header.format[0] == 'W' && header.format[1] == 'A' && header.format[2] == 'V' && header.format[3] == 'E') {
         return 1;
@@ -22,6 +24,13 @@ int getBlockSize(WAVHEADER header) {
     return channels * BytesPerSample;
 }
 
+/**
+ * Drives the program.
+ *
+ * @param argc integer representing that stores the number of command-line arguments passed by the user.
+ * @param argv array of character representing the pointers listing all the arguments.
+ * @return the program code depending on successful or failed execution.
+ */
 int main(int argc, char *argv[]) {
 
     // ensure valid usage
